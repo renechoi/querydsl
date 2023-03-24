@@ -514,5 +514,14 @@ public class QuerydslBasicTest {
                 .execute();
     }
 
+    @Test
+    public void sqlFunction(){
+        String result = queryFactory
+                .select(Expressions.stringTemplate("function('replace', {0}, {1}, {2})", member.username, "member", "M"))
+//                .where(member.username.eq(member.username.lower()))
+                .from(member)
+                .fetchFirst();
+    }
+
 }
 
