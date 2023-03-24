@@ -1,5 +1,6 @@
 package study.querydsl;
 
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,8 @@ import study.querydsl.entity.Team;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static study.querydsl.entity.QMember.*;
@@ -44,8 +47,8 @@ public class QuerydslBasicTest {
     public void startJPQL() {
         //member1을 찾아라.
         String qlString =
-        "select m from Member m " +
-                "where m.username = :username";
+                "select m from Member m " +
+                        "where m.username = :username";
         Member findMember = em.createQuery(qlString, Member.class)
                 .setParameter("username", "member1")
                 .getSingleResult();
@@ -78,16 +81,53 @@ public class QuerydslBasicTest {
 
     /**
      * member.username.eq("member1") // username = 'member1'
-     *     member.username.ne("member1") //username != 'member1'
-     *     member.username.eq("member1").not() // username != 'member1'
+     * member.username.ne("member1") //username != 'member1'
+     * member.username.eq("member1").not() // username != 'member1'
      * member.username.isNotNull() //이름이 is not null
-     *     member.age.in(10, 20) // age in (10,20)
-     *     member.age.notIn(10, 20) // age not in (10, 20)
-     *     member.age.between(10,30) //between 10, 30
-     *      member.age.goe(30) // age >= 30
-     *    member.age.gt(30) // age > 30
-     *   member.age.loe(30) // age <= 30
-     *   member.age.lt(30) // age < 30
+     * member.age.in(10, 20) // age in (10,20)
+     * member.age.notIn(10, 20) // age not in (10, 20)
+     * member.age.between(10,30) //between 10, 30
+     * member.age.goe(30) // age >= 30
+     * member.age.gt(30) // age > 30
+     * member.age.loe(30) // age <= 30
+     * member.age.lt(30) // age < 30
      * member.username.like("member%") //like 검색 member.username.contains("member") // like ‘%member%’ 검색 member.username.startsWith("member") //like ‘member%’ 검색
      */
+
+
+    @Test
+    public void searchAndParam() {
+        List<Member> result1 = queryFactory
+                .selectFrom(member)
+                .where(
+                        member.username.eq("member1"),
+                        member.age.eq(10))
+                .fetch();
+        assertThat(result1.size()).isEqualTo(1);
+    }
+
+
+    public void fetchResults() {
+
+        //List
+        List<Member> fetch = queryFactory
+                .selectFrom(member)
+                .fetch();
+        //단 건
+        Member findMember1 = queryFactory
+                .selectFrom(member)
+                .fetchOne();
+        //처음 한 건 조회
+        Member findMember2 = queryFactory
+                .selectFrom(member)
+                .fetchFirst();
+        //페이징에서 사용
+        QueryResults<Member> results = queryFactory
+                .selectFrom(member)
+                .fetchResults();
+        //count 쿼리로 변경
+        long count = queryFactory
+                .selectFrom(member)
+                .fetchCount();
+    }
 }
