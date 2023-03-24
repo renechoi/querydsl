@@ -450,5 +450,11 @@ public class QuerydslBasicTest {
                 .fetch();
     }
 
-
+    @Test
+    void findDtoByQueryProjection() {
+        List<MemberDto> result = queryFactory
+                .select(new QMemberDto(member.username, member.age))
+                .from(member)
+                .fetch();
+    }
 }
