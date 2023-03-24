@@ -503,5 +503,16 @@ public class QuerydslBasicTest {
         return ageCond != null ? member.age.eq(ageCond) : null;
     }
 
+    public void bulkUpdate(){
+        long count = queryFactory
+                .update(member)
+                .set(member.username, "비회원") .where(member.age.lt(28)) .execute();
+
+        long count2 = queryFactory
+                .update(member)
+                .set(member.age, member.age.add(1))
+                .execute();
+    }
+
 }
 
